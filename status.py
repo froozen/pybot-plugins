@@ -68,6 +68,16 @@ def on_privmsg ( event, server ):
         back_event = irc.Irc_event ( "PRIVMSG", event.args [ 0 ], "%s is back." % event.name )
         server.send_event ( back_event )
 
+def afk_token ( event, server ):
+    channel = server.user_data.get_channel ( event.args [ 0 ] )
+    afk_nicks = []
+
+    for user in channel.users:
+        if server.shared_data.get ( "afk.%s.bool" % user.nick ):
+            afk_nicks.append ( user.nick )
+
+    return ", ".join ( afk_nicks )
+
 plugin_manager.register_command ( "afk", afk_command )
 plugin_manager.register_command ( "status", status_command )
 plugin_manager.register_event_handler ( "QUIT", on_quit )
@@ -76,3 +86,5 @@ plugin_manager.register_event_handler ( "PRIVMSG", on_privmsg )
 
 shared_data.set ( "help.afk", "Mark your self as afk. You can add a message." )
 shared_data.set ( "hel.status", "Get the status of a user." )
+
+shared_data.set ( "greeter.tokens.afk", afk_token )

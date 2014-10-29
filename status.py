@@ -86,6 +86,6 @@ plugin_manager.register_event_handler ( "PART", on_part )
 plugin_manager.register_event_handler ( "PRIVMSG", on_privmsg )
 
 shared_data.set ( "help.afk", "Mark your self as afk. You can add a message." )
-shared_data.set ( "hel.status", "Get the status of a user." )
+shared_data.set ( "help.status", "Get the status of a user." )
 
 shared_data.set ( "greeter.tokens.afk", afk_token )

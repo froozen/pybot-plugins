@@ -26,19 +26,20 @@ def status_command ( command, server ):
     # Display afk status for each name
     if len ( command.args ) > 0:
         for name in command.args:
-            if server.shared_data.get ( "afk.%s.bool" % name ):
-                if server.shared_data.get ( "afk.%s.message" % name ):
-                    message = server.shared_data.get ( "afk.%s.message" % name )
-                    status_event = irc.Irc_event ( "PRIVMSG", channel, "%s is afk ( %s )" % ( name, message ) )
-                    server.send_event ( status_event )
+            if not name == "":
+                if server.shared_data.get ( "afk.%s.bool" % name ):
+                    if server.shared_data.get ( "afk.%s.message" % name ):
+                        message = server.shared_data.get ( "afk.%s.message" % name )
+                        status_event = irc.Irc_event ( "PRIVMSG", channel, "%s is afk ( %s )" % ( name, message ) )
+                        server.send_event ( status_event )
+
+                    else:
+                        status_event = irc.Irc_event ( "PRIVMSG", channel, "%s is afk" % name )
+                        server.send_event ( status_event )
 
                 else:
-                    status_event = irc.Irc_event ( "PRIVMSG", channel, "%s is afk" % name )
+                    status_event = irc.Irc_event ( "PRIVMSG", channel, "%s is not afk" % name )
                     server.send_event ( status_event )
-
-            else:
-                status_event = irc.Irc_event ( "PRIVMSG", channel, "%s is not afk" % name )
-                server.send_event ( status_event )
 
 def undo_afk ( server, name ):
     """Undo the afk status of the user corresponding to name."""

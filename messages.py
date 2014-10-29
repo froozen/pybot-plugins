@@ -72,14 +72,15 @@ def rm_command ( command, server ):
             messages = server.persistent_data.get ( "messages.%s.inbox" % user )
 
             for arg in command.args:
-                try:
-                    server.persistent_data.remove ( "messages.%s.inbox" % user, messages [ int ( arg ) ] )
-                except ValueError:
-                    number_error_event = irc.Irc_event ( "PRIVMSG", user, "\"%s\" is no valid number." % arg )
-                    server.send_event ( number_error_event )
-                except IndexError:
-                    index_error_event = irc.Irc_event ( "PRIVMSG", user, "%s is no valid index." % arg )
-                    server.send_event ( index_error_event )
+                if not arg == "":
+                    try:
+                        server.persistent_data.remove ( "messages.%s.inbox" % user, messages [ int ( arg ) ] )
+                    except ValueError:
+                        number_error_event = irc.Irc_event ( "PRIVMSG", user, "\"%s\" is no valid number." % arg )
+                        server.send_event ( number_error_event )
+                    except IndexError:
+                        index_error_event = irc.Irc_event ( "PRIVMSG", user, "%s is no valid index." % arg )
+                        server.send_event ( index_error_event )
 
 def autoremove_command ( command, server ):
     """Execute the )autoremove command."""

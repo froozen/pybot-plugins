@@ -9,14 +9,15 @@ def roll_command ( command, server ):
     # Roll a number within the given range
     if len ( command.args ) > 0:
         for arg in command.args:
-            try:
-                number = random.randint ( 0, int ( arg ) )
-                roll_event = irc.Irc_event ( "PRIVMSG", channel, "You rolled %d." % number )
-                server.send_event ( roll_event )
+            if not arg == "":
+                try:
+                    number = random.randint ( 0, int ( arg ) )
+                    roll_event = irc.Irc_event ( "PRIVMSG", channel, "You rolled %d." % number )
+                    server.send_event ( roll_event )
 
-            except ValueError:
-                error_event = irc.Irc_event ( "PRIVMSG", channel, "%s is no valid number." % arg )
-                server.send_event ( error_event )
+                except ValueError:
+                    error_event = irc.Irc_event ( "PRIVMSG", channel, "%s is no valid number." % arg )
+                    server.send_event ( error_event )
 
     # Roll a number from 0 trough 1
     else:

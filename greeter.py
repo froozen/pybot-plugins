@@ -13,7 +13,7 @@ def on_join ( event, server ):
 def _generate_greeting ( event, server ):
     # No welcomemsg set
     if not server.persistent_data.get ( "greeter.%s.welcomemsgs" % event.name ):
-        return "Welcome on %s, %s." % ( channel, event.name )
+        return "Welcome on %s, %s." % ( event.args [ 0 ], event.name )
 
     if shared_data.get ( "greeter.tokens" ):
         tokens = shared_data.get ( "greeter.tokens" )

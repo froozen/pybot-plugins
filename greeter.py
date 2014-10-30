@@ -25,7 +25,6 @@ def _generate_greeting ( event, server ):
                     insert = tokens [ token ] ( event, server )
                     welcomemsg = welcomemsg.replace ( "%%%s%%" % token, insert )
                 except:
-                    raise
                     welcomemsg = welcomemsg.replace ( "%%%s%%" % token, "Failed" )
 
         return welcomemsg

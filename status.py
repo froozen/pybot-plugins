@@ -27,25 +27,60 @@ def status_command ( command, server ):
     if len ( command.args ) > 0:
         for name in command.args:
             if not name == "":
+                mark_type = None
                 if server.shared_data.get ( "afk.%s.bool" % name ):
-                    if server.shared_data.get ( "afk.%s.message" % name ):
-                        message = server.shared_data.get ( "afk.%s.message" % name )
-                        status_event = irc.Irc_event ( "PRIVMSG", channel, "%s is afk ( %s )" % ( name, message ) )
-                        server.send_event ( status_event )
+                    mark_type = "afk"
+                if server.shared_data.get ( "afk.%s.probably" % name ):
+                    mark_type = "probably afk"
 
-                    else:
-                        status_event = irc.Irc_event ( "PRIVMSG", channel, "%s is afk" % name )
-                        server.send_event ( status_event )
-
-                else:
+                if mark_type == None:
                     status_event = irc.Irc_event ( "PRIVMSG", channel, "%s is not afk" % name )
                     server.send_event ( status_event )
+                else:
+                    if server.shared_data.get ( "afk.%s.message" % name ):
+                        message = server.shared_data.get ( "afk.%s.message" % name )
+                        status_event = irc.Irc_event ( "PRIVMSG", channel, "%s is %s ( %s )" % ( name, mark_type, message ) )
+                        server.send_event ( status_event )
+                    else:
+                        status_event = irc.Irc_event ( "PRIVMSG", channel, "%s is %s" % ( name, mark_type ) )
+                        server.send_event ( status_event )
+
+def afkPropose_command ( command, server ):
+    """Execute the )afkPropose command."""
+
+    channel = command.event.args [ 0 ] if not command.event.args [ 0 ] == server.nick else command.event.name
+
+    if len ( command.args ) < 1:
+        return # Ignore.
+
+    proposer = command.event.name
+    target = command.args [ 0 ]
+
+    if server.shared_data.get ( "afk.%s.bool" % target ):
+        reject_event = irc.Irc_event ( "PRIVMSG", channel, "%s is already afk." % target )
+        server.send_event ( reject_event )
+        return
+
+    # Set afk message
+    if len ( command.args ) > 1:
+        message = " ".join ( command.args [ 1 : ] )
+        server.shared_data.set ( "afk.%s.message" % target, message )
+
+    # Mark user as possibly afk
+    server.shared_data.set ( "afk.%s.probably" % target, True )
+    server.shared_data.set ( "afk.%s.proposer" % target, proposer )
+
+    # Send announcing message
+    announce_event = irc.Irc_event ( "PRIVMSG", channel, "%s is now probably afk." % target )
+    server.send_event ( announce_event )
 
 def undo_afk ( server, name ):
     """Undo the afk status of the user corresponding to name."""
 
     server.shared_data.set ( "afk.%s.message" % name, None )
     server.shared_data.set ( "afk.%s.bool" % name, False )
+    server.shared_data.set ( "afk.%s.probably" % name, False )
+    server.shared_data.set ( "afk.%s.proposer" % name, False )
 
 def on_quit ( event, server ):
     """Handle QUIT events."""
@@ -62,10 +97,12 @@ def on_part ( event, server ):
 def on_privmsg ( event, server ):
     """Handle PRIVMSG events."""
 
-    # Notify that user is back
-    if server.shared_data.get ( "afk.%s.bool" % event.name ):
+    is_marked = server.shared_data.get ( "afk.%s.bool" % event.name ) or server.shared_data.get ( "afk.%s.probably" % event.name )
+
+    if is_marked:
         undo_afk ( server, event.name )
 
+        # Notify that user is back
         back_event = irc.Irc_event ( "PRIVMSG", event.args [ 0 ], "%s is back." % event.name )
         server.send_event ( back_event )
 
@@ -76,16 +113,20 @@ def afk_token ( event, server ):
     for user in channel.users:
         if server.shared_data.get ( "afk.%s.bool" % user.nick ):
             afk_nicks.append ( user.nick )
+        if server.shared_data.get ( "afk.%s.probably" % user.nick ):
+            afk_nicks.append ( "~" + user.nick )
 
     return ", ".join ( afk_nicks )
 
 plugin_manager.register_command ( "afk", afk_command )
 plugin_manager.register_command ( "status", status_command )
+plugin_manager.register_command ( "afkPropose", afkPropose_command )
 plugin_manager.register_event_handler ( "QUIT", on_quit )
 plugin_manager.register_event_handler ( "PART", on_part )
 plugin_manager.register_event_handler ( "PRIVMSG", on_privmsg )
 
 shared_data.set ( "help.afk", "Mark your self as afk. You can add a message." )
+shared_data.set ( "help.afkPropose", "Mark somebody else as probably afk. You can add a message." )
 shared_data.set ( "help.status", "Get the status of a user." )
 
 shared_data.set ( "greeter.tokens.afk", afk_token )

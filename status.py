@@ -31,7 +31,7 @@ def status_command ( command, server ):
                 if server.shared_data.get ( "afk.%s.bool" % name ):
                     mark_type = "afk"
                 if server.shared_data.get ( "afk.%s.probably" % name ):
-                    mark_type = "probably afk"
+                    mark_type = "proposed as afk by %s" % server.shared_data.get ( "afk.%s.proposer" % name )
 
                 if mark_type == None:
                     status_event = irc.Irc_event ( "PRIVMSG", channel, "%s is not afk" % name )

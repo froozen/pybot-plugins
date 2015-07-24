@@ -9,16 +9,17 @@ def on_privmsg ( event, server ):
     message = event.args [ 1 ]
 
     # Find the URLs
-    for url_match in re.finditer( "http(s)://.*?( |$)", message ):
+    for url_match in re.finditer( "http(s)?://.*?( |$)", message ):
         url = url_match.group( 0 )
 
         try:
             html = urllib.urlopen( url ).read ()
             # Find the title tag
-            title_match = re.search( "<title *>(.*?)</title *>", html )
+            title_match = re.search( "(?s)<title *>(.*?)</title *>", html )
             if title_match:
                 # Reply with the URL's title
-                reply = irc.Irc_event ( "PRIVMSG", channel, "[%s] - %s" % ( title_match.group(1), url ) )
+                title = title_match.group( 1 ).strip ()
+                reply = irc.Irc_event ( "PRIVMSG", channel, "[%s] - %s" % ( title, url ) )
                 server.send_event ( reply )
 
         # The opening of URLs might fail

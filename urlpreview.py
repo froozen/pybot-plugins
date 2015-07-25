@@ -1,6 +1,7 @@
 from pybot import irc, plugin_manager
 import re
 import urllib
+import HTMLParser
 
 def on_privmsg ( event, server ):
     """Detect urls in messages and reply with their titles"""
@@ -19,6 +20,7 @@ def on_privmsg ( event, server ):
             if title_match:
                 # Reply with the URL's title
                 title = title_match.group( 1 ).strip ()
+                title = HTMLParser.HTMLParser().unescape( title )
                 reply = irc.Irc_event ( "PRIVMSG", channel, "[%s] - %s" % ( title, url ) )
                 server.send_event ( reply )
 

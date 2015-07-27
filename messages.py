@@ -2,6 +2,7 @@ from pybot import plugin_manager, irc, shared_data
 import time
 
 
+@plugin_manager.command("msg")
 def msg_command(command, server):
     """Execute the )msg command."""
 
@@ -28,6 +29,7 @@ def msg_command(command, server):
             server.persistent_data.set("messages.%s.unseen" % receipent, True)
 
 
+@plugin_manager.command("cm")
 def cm_command(command, server):
     """Execute the )cm command."""
 
@@ -65,6 +67,7 @@ def cm_command(command, server):
     server.send_event(no_messages_event)
 
 
+@plugin_manager.command("rm")
 def rm_command(command, server):
     """Execute the )rm command."""
 
@@ -95,6 +98,7 @@ def rm_command(command, server):
                         server.send_event(index_error_event)
 
 
+@plugin_manager.command("autoremove")
 def autoremove_command(command, server):
     """Execute the )autoremove command."""
 
@@ -123,6 +127,7 @@ def autoremove_command(command, server):
             server.send_event(display_event)
 
 
+@plugin_manager.event_handler("JOIN")
 def on_join(event, server):
     """Handle JOIN events."""
 
@@ -132,12 +137,6 @@ def on_join(event, server):
         unseen_messages_event = irc.Irc_event(
             "PRIVMSG", event.name, "You have unseen messages.")
         server.send_event(unseen_messages_event)
-
-plugin_manager.register_command("msg", msg_command)
-plugin_manager.register_command("cm", cm_command)
-plugin_manager.register_command("rm", rm_command)
-plugin_manager.register_command("autoremove", autoremove_command)
-plugin_manager.register_event_handler("JOIN", on_join)
 
 shared_data.set("help.msg", "Send a message to a user that is afk or offline.")
 shared_data.set("help.cm", "Check your inbox.")

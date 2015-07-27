@@ -1,6 +1,7 @@
 from pybot import plugin_manager, irc, shared_data
 
 
+@plugin_manager.command("afk")
 def afk_command(command, server):
     """Execute the )afk command."""
 
@@ -21,6 +22,7 @@ def afk_command(command, server):
     server.send_event(announce_event)
 
 
+@plugin_manager.command("status")
 def status_command(command, server):
     """Execute the )status command."""
 
@@ -55,6 +57,7 @@ def status_command(command, server):
                         server.send_event(status_event)
 
 
+@plugin_manager.command("afkPropose")
 def afkPropose_command(command, server):
     """Execute the )afkPropose command."""
 
@@ -97,12 +100,14 @@ def undo_afk(server, name):
     server.shared_data.set("afk.%s.proposer" % name, False)
 
 
+@plugin_manager.event_handler("QUIT")
 def on_quit(event, server):
     """Handle QUIT events."""
 
     undo_afk(server, event.name)
 
 
+@plugin_manager.event_handler("PART")
 def on_part(event, server):
     """Handle PART events."""
 
@@ -111,6 +116,7 @@ def on_part(event, server):
         undo_afk(server, event.name)
 
 
+@plugin_manager.event_handler("PRIVMSG")
 def on_privmsg(event, server):
     """Handle PRIVMSG events."""
 
@@ -137,13 +143,6 @@ def afk_token(event, server):
             afk_nicks.append("~" + user.nick)
 
     return ", ".join(afk_nicks)
-
-plugin_manager.register_command("afk", afk_command)
-plugin_manager.register_command("status", status_command)
-plugin_manager.register_command("afkPropose", afkPropose_command)
-plugin_manager.register_event_handler("QUIT", on_quit)
-plugin_manager.register_event_handler("PART", on_part)
-plugin_manager.register_event_handler("PRIVMSG", on_privmsg)
 
 shared_data.set("help.afk", "Mark your self as afk. You can add a message.")
 shared_data.set(

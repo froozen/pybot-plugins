@@ -1,6 +1,7 @@
 from pybot import irc, plugin_manager, shared_data
 
 
+@plugin_manager.event_handler("JOIN")
 def on_join(event, server):
     """Handle JOIN events."""
 
@@ -34,6 +35,7 @@ def _generate_greeting(event, server):
         return welcomemsg
 
 
+@plugin_manager.command("welcomemsg")
 def welcomemsg_command(command, server):
     """Execute the )welcomemsg command."""
 
@@ -58,7 +60,10 @@ def welcomemsg_command(command, server):
             server.send_event(output_event)
 
 
+@plugin_manager.command("tokens")
 def tokens_command(command, server):
+    """Execute the )tokens command."""
+
     channel = command.event.args[0] if not command.event.args[
         0] == server.nick else command.event.name
 
@@ -78,10 +83,6 @@ def tokens_command(command, server):
 
 def channel_token(event, server):
     return event.args[0]
-
-plugin_manager.register_event_handler("JOIN", on_join)
-plugin_manager.register_command("welcomemsg", welcomemsg_command)
-plugin_manager.register_command("tokens", tokens_command)
 
 shared_data.set("help.welcomemsg", "Change the bots greeting.")
 shared_data.set(

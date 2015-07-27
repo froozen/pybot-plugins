@@ -20,6 +20,7 @@ def valid_url(url):
         return filetype in valid_filetypes
 
 
+@plugin_manager.event_handler("PRIVMSG")
 def on_privmsg(event, server):
     """Detect urls in messages and reply with their titles"""
 
@@ -49,5 +50,3 @@ def on_privmsg(event, server):
                 reply = irc.Irc_event(
                     "PRIVMSG", channel, "Failed to open url: %s" % url)
                 server.send_event(reply)
-
-plugin_manager.register_event_handler("PRIVMSG", on_privmsg)

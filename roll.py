@@ -2,6 +2,7 @@ from pybot import plugin_manager, irc, shared_data
 import random
 
 
+@plugin_manager.command("roll")
 def roll_command(command, server):
     """Execute the )roll command."""
 
@@ -30,5 +31,4 @@ def roll_command(command, server):
             "PRIVMSG", channel, "You rolled %f." % number)
         server.send_event(roll_event)
 
-plugin_manager.register_command("roll", roll_command)
 shared_data.set("help.roll", "Roll a random number.")

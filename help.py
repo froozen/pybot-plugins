@@ -1,6 +1,7 @@
 from pybot import plugin_manager, shared_data, irc
 
 
+@plugin_manager.command("help")
 def help_command(command, server):
     """Execute the )help command."""
 
@@ -24,7 +25,5 @@ def help_command(command, server):
                     topic_event = irc.Irc_event(
                         "PRIVMSG", channel, "%s: %s" % (topic, help_data[topic]))
                     server.send_event(topic_event)
-
-plugin_manager.register_command("help", help_command)
 
 shared_data.set("help.help", "Display information about a topic.")

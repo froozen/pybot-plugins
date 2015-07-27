@@ -348,6 +348,7 @@ def generate_messages(updates):
     return filter(lambda line: not line == "", result)
 
 
+@plugin_manager.event_handler("JOIN")
 def on_join(event, server):
     channel = event.args[0]
     running = server.shared_data.get("gh.%s.running" % channel)
@@ -357,6 +358,7 @@ def on_join(event, server):
         plugin_manager._dispatch(query_thread(server, channel))
 
 
+@plugin_manager.command("gh_add")
 def gh_add_cmd(command, server):
     """Execute the )gh_add command."""
 
@@ -380,6 +382,7 @@ def gh_add_cmd(command, server):
         server.send_event(irc.Irc_event("PRIVMSG", channel, "Usage: )gh_add <user> to start watching a user on github"))
 
 
+@plugin_manager.command("gh_del")
 def gh_del_cmd(command, server):
     """Execute the )gh_del command."""
 
@@ -393,10 +396,6 @@ def gh_del_cmd(command, server):
     else:
         server.send_event(irc.Irc_event("PRIVMSG", channel, "Usage: )gh_del <user> to stop watching a user on github"))
 
-
-plugin_manager.register_event_handler("JOIN", on_join)
-plugin_manager.register_command("gh_add", gh_add_cmd)
-plugin_manager.register_command("gh_del", gh_del_cmd)
 
 shared_data.set("help.gh_add", "Start watching a user on github")
 shared_data.set("help.gh_del", "Stop watching a user on github")

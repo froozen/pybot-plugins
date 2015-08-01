@@ -28,8 +28,8 @@ def on_privmsg(event, server):
     message = event.args[1]
 
     # Find the URLs
-    for url_match in re.finditer("http(s)?://.*?( |$)", message):
-        url = url_match.group(0)
+    for url_match in re.finditer("(http(?:s)?://.*?)( |\\?|$)", message):
+        url = url_match.group(1)
 
         # Check wether the URL should be highlighted
         if valid_url(url):

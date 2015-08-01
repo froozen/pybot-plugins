@@ -13,7 +13,13 @@ def valid_content(url):
     host = url_split[0]
     path = '/'.join(url_split[1:])
 
-    http_connection = httplib.HTTPSConnection(host)
+    http_connection = None
+    connection_type = url.split(':')[0]
+    if connection_type == "https":
+        http_connection = httplib.HTTPSConnection(host)
+    else:
+        http_connection = httplib.HTTPConnection(host)
+
     http_connection.connect()
     http_connection.request("HEAD", path)
     resp = http_connection.getresponse()

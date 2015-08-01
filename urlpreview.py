@@ -1,23 +1,28 @@
 from pybot import irc, plugin_manager
 import re
+import httplib
 import urllib
 import HTMLParser
 
 
-def valid_url(url):
-    """Check wether an URL should be highlighted"""
+def valid_content(url):
+    """Check wether an URL should be highlighted by checking the Content-Type
+       header"""
 
-    valid_filetypes = ["html", "htm", "php"]
-    url_split = url.split("/")[2:]
+    url_split = url.split('/')[2:]
+    host = url_split[0]
+    path = '/'.join(url_split[1:])
 
-    # Highlight it, if it has no filetype or is the home page
-    if len(url_split) == 1 or not "." in url_split[-1]:
-        return True
+    http_connection = httplib.HTTPSConnection(host)
+    http_connection.connect()
+    http_connection.request("HEAD", path)
+    resp = http_connection.getresponse()
 
-    # Otherwise, check wether it has a valid filetype
+    content_type = resp.getheader("Content-Type")
+    if content_type:
+        return content_type.split(';')[0] == "text/html"
     else:
-        filetype = url_split[-1].split(".")[-1]
-        return filetype in valid_filetypes
+        return False
 
 
 @plugin_manager.event_handler("PRIVMSG")
@@ -32,7 +37,7 @@ def on_privmsg(event, server):
         url = url_match.group(1)
 
         # Check wether the URL should be highlighted
-        if valid_url(url):
+        if valid_content(url):
             try:
                 html = urllib.urlopen(url).read()
                 # Find the title tag

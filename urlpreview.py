@@ -52,6 +52,7 @@ def on_privmsg(event, server):
                     # Reply with the URL's title
                     title = title_match.group(1).strip()
                     title = HTMLParser.HTMLParser().unescape(title)
+                    title = title.replace("\n", " ")
                     reply = irc.Irc_event(
                         "PRIVMSG", channel, "[%s] - %s" % (title, url))
                     server.send_event(reply)

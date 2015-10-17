@@ -12,3 +12,4 @@ A set of handy plugins for the [pybot IRC-bot](https://github.com/froozen/pybot)
 * `status`: Mark yourself or other users as afk.
 * `urlpreview`: Make the bot detect URLs send on the channel and display the
    webpages titles.
+* `matelight`: Write things on the [matelight](https://github.com/jaseg/matelight)
